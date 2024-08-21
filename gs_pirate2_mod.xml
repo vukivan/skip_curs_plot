@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mdscript name="GS_Pirate2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="md.xsd">
+  <cues>
+    <cue name="Start" namespace="this" module="x4ep1_gamestart_pirate2">
+      <conditions>
+        <event_cue_completed cue="md.Setup_Gamestarts.X4ep1_Gamestart_Pirate_Shared" />
+      </conditions>
+      <actions>
+        <set_value name="$debugchance" exact="0" comment="keep ai-scripts from complaining"/>
+        <set_value name="$DebugChance" exact="0"/>
+		<set_value name="$MissionCue"  exact="this"/>
+        <set_value name="md.Signal_Leaks.Manager.$SuppressSignalLeakGeneration" exact="true"/>
+      </actions>
+      <delay exact="0.1s"/>
+      <actions>
+        <signal_cue cue="Setup"/>
+      </actions>
+      <cues>
+
+        <cue name="Setup">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <find_sector name="$18BilSector"  macro="macro.cluster_02_sector001_macro"    required="true" />
+            <find_sector name="$S1a_North"    macro="macro.Cluster_501_Sector001_macro"   required="true" />
+            <find_gate name="$Gate18toS1a" space="$18BilSector" destination="$S1a_North" required="true"/>
+            <set_value name="$AxiomActor" exact="md.$PersistentCharacters.$AxiomActor"/>
+            <set_value name="$AxiomActorCutsceneKey"   exact="table[ $key = 'ShowNPCFace']"/>
+          </actions>
+          <delay exact="0.1s"/>
+          <actions>
+            <append_to_list name="md.$MissionDND" exact="Setup"/>
+          </actions>
+		  <delay exact="5s"/>
+          <actions>
+            <signal_cue cue="Ch1_Intro"/>
+          </actions>
+          <cues>
+
+            <cue name="Setup_Map">
+              <actions>
+                <set_value name="$InitialMap" exact="[
+                    macro.cluster_02_sector001_macro
+                  ]"/>
+                <run_actions ref="md.LIB_Generic.UncoverMap_SectorsAndGates" >
+                  <param name="InitialMap" value="$InitialMap"/>
+                </run_actions>
+              </actions>
+            </cue>
+
+            <cue name="Setup_Prison_Station">
+              <actions>
+                <find_sector name="$EighteenBillionSector" macro="macro.cluster_02_sector001_macro" required="true"/>
+                <find_station name="$PrisonStation" space="$EighteenBillionSector" godstationentry="'story_prison_station_id'" required="true"/>
+
+                <find_object_component name="$PrisonModule"   object="$PrisonStation" macro="macro.landmarks_gen_prison_01_macro" recursive="true"/>
+                <find_object_component name="$PrisonCorridor" object="$PrisonModule"  macro="macro.prison_escape_v2_macro" recursive="true"/>
+                <find_object_component name="$PrisonEmitter"  object="$PrisonModule"  macro="macro.room_gen_prison_forceemitter_macro" recursive="true"/>
+                <set_object_active object="$PrisonEmitter" activate="false" comment="No push effect, during the gamestart"/>
+
+                <!-- dynamic rooms already created in setup_dlc_pirate.xml -->
+                <set_value name="$PrisonRoom2" exact="md.Setup_DLC_Pirate.X4ep1_Prelude_Setup.$PrisonRoom2" comment="prison-room on the 1B floor"/>
+                <set_value name="$PrisonRoom3" exact="md.Setup_DLC_Pirate.X4ep1_Prelude_Setup.$PrisonRoom3" comment="prison-room on the 1B floor"/>
+                <set_value name="$PrisonRoom4" exact="md.Setup_DLC_Pirate.X4ep1_Prelude_Setup.$PrisonRoom4" comment="prison-room on the 1B floor"/>
+                <set_value name="$OtherPrisoner" exact="md.Setup_DLC_Pirate.X4ep1_Prelude_Setup.$OtherPrisoner" comment="teladi prisoner"/>
+
+                <set_object_relation_behaviour object="$PrisonStation" disable="true"/>
+
+                <set_value name="$PrisonRoom" exact="player.room"/>
+
+                <!-- setup cell doors -->
+                <set_triggers_locked object="$PrisonRoom" group="tag.door_01" locked="true" comment="left cell / door button"/>
+                <!--set_triggers_locked object="$PrisonRoom" group="tag.door_03" locked="true" comment="right cell / door button (don't lock, because this results in a double-lock in Ch6_Axiom_HackingConsole_HackDone (see TOA-216)"/-->
+                <!-- setup door-switches -->
+                <find_object_component groupname="this.$PrisonSwitches" object="$PrisonModule" macro="[macro.props_special_doorclamp_01_macro, macro.interactive_pir_doorcontrol_01_macro]" multiple="true" required="true" />
+                <do_for_each name="this.$switch" in="this.$PrisonSwitches">
+                  <set_object_min_hull object="this.$switch" exact="1" comment="don't allow destruction of switches"/>
+                </do_for_each>
+                <!-- setup triggers -->
+                <trigger_animation object="$PrisonRoom" group="tag.light_01" trigger="activate"/>
+
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+        <!-- Not using Lib_Dialog intentionally in Ch1, player doesn't have communicator-device with Axiom -->
+        <cue name="Ch1_Intro">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <debug_text text="'Starting Pirate gamestart 2'" chance="$DebugChance"/>
+
+            <find_object_component name="$PrisonSwitchCellPower"    object="$PrisonModule" macro="macro.interactive_pir_doorcontrol_01_macro" grouptag="tag.cellpower"    required="true" />
+            <find_object_component name="$PrisonSwitchLowerAirlock" object="$PrisonModule" macro="macro.props_special_doorclamp_01_macro" grouptag="tag.lowerairlock" required="true" />
+            <set_object_hull object="$PrisonSwitchCellPower" exact="50" comment="player-goal is to repair it (player only has repair-laser initially)"/>
+            <add_to_group groupname="$PrisonStation.engineer.$ExcludedRepairElements" object="$PrisonSwitchCellPower" comment="avoid station engineer from repairing it"/>
+            <add_to_group groupname="$PrisonStation.engineer.$ExcludedRepairElements" object="$PrisonSwitchLowerAirlock"  comment="avoid station engineer from repairing it"/>
+
+            <!-- silence global hints -->
+            <set_value name="md.$GlobalHintsDND" exact="true" />
+          </actions>
+          <cues>
+		    <cue name="Ch1_LightBlink" checkinterval="1s" instantiate="true">
+			  <delay exact="[0.8s, 1.5s, 3s].random"/>
+			  <actions>
+				<do_if value="@$Light1Status">
+				  <trigger_animation object="$PrisonRoom" group="tag.light_01" trigger="activate"/>
+				  <remove_value name="$Light1Status"/>
+
+				  <add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_single'">
+					<position space="$PrisonRoom" x="3.0m" y="2.9m" z="-6.4m"/>
+				  </add_effect>
+
+				</do_if>
+				<do_else>
+				  <trigger_animation object="$PrisonRoom" group="tag.light_01" trigger="deactivate"/>
+				  <set_value name="$Light1Status" exact="true"/>
+				</do_else>
+			  </actions>
+			</cue>
+			<cue name="Ch1_SetupCrate">
+              <actions>
+                <find_crate_slot name="$CrateSlots" object="$PrisonRoom3" tags="[tag.crate_s, tag.crate_ontable]" multiple="true"/>
+                <debug_text text="'Found #crateslots:' + $CrateSlots.count" chance="$DebugChance"/>
+                <create_crate name="$ToolboxCrate" macro="macro.crate_gen_s_01_macro" slot="$CrateSlots.random" />
+                <add_cargo object="$ToolboxCrate" ware="ware.weapon_gen_spacesuit_laser_01_mk1" exact="1"/>
+                <!--add_cargo object="$ToolboxCrate" ware="ware.weapon_gen_spacesuit_laser_02_mk1" exact="1"/-->
+              </actions>
+            </cue>
+			<cue name="Ch1_SetupRemoveLeaks" comment="remove voice-leaks, during the spacesuit parts they repeat every few seconds endlessly and it becomes annoying very quickly ">
+              <actions>
+                <find_object_component name="$Leaks" object="$PrisonStation" signalleaktype="signalleaktype.voice" multiple="true"/>
+                <do_for_each name="$leak" in="$Leaks">
+                  <destroy_object object="$leak" explosion="false"/>
+                </do_for_each>
+              </actions>
+            </cue>
+			<cue name="Ch1_SetupPrisonEffects">
+              <delay exact="2s"/>
+              <actions>
+
+                <!-- cell door buttons -->
+                <!--add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_tiny'">
+                      <position space="$PrisonRoom" x="1.89m" y="1.34m" z="-4.88m"/>
+                    </add_effect-->
+
+                <add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_tiny'">
+                      <position space="$PrisonRoom" x="-1.9m" y="1.34m" z="-4.88m"/>
+                    </add_effect>
+
+                <!-- console buttons -->
+                <add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_tiny'">
+                  <position space="$PrisonRoom" x="3.01m" y="0.87m" z="-2.4m"/>
+                </add_effect>
+
+                <!--add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_tiny'">
+                  <position space="$PrisonRoom" x="2.75m" y="0.87m" z="-2.4m"/>
+                </add_effect-->
+
+                <!-- Axioms lightswitch-->
+                <!--add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_tiny'">
+                  <position space="$PrisonRoom" x="3.96m" y="1.36m" z="-5.3m"/>
+                </add_effect-->
+
+              </actions>
+            </cue>
+            <cue name="Ch1_SetupEscape">
+              <actions>
+                <find_object_component name="$PrisonMarker_02" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy2_macro"  required="true" comment="exit tunnel corner"/>
+                <find_object_component name="$PrisonMarker_03" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy3_macro"  required="true" comment="exit tunnel axiom-spawn"/>
+                <find_object_component name="$PrisonMarker_04" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy4_macro"  required="true" comment="First t-split after gamestart cell"/>
+                <find_object_component name="$PrisonMarker_05" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy5_macro"  required="true" comment="transition tunnel into space"/>
+                <find_object_component name="$PrisonMarker_07" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy7_macro"  required="true" comment="Junction in front of transporter room on Floor 1"/>
+                <find_object_component name="$PrisonMarker_08" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy8_macro"  required="true" comment="Immediately in front of transporter room on Floor 1"/>
+
+                <find_object_component name="$PrisonMarker_15" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy15_macro"  required="true" comment="Floor 1 circledoor 1"/>
+                <find_object_component name="$PrisonMarker_16" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy16_macro"  required="true" comment="Floor 1 circledoor 2"/>
+                <find_object_component name="$PrisonMarker_17" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy17_macro"  required="true" comment="Floor 2 circledoor 1"/>
+                <find_object_component name="$PrisonMarker_18" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy16_macro"  required="true" comment="Floor 2 circledoor 2"/>
+                <find_object_component name="$PrisonMarker_20" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy20_macro"  required="true" comment="Floor 1 in front of the airlock into 'the tower'"/>
+
+                <find_object_component name="$PrisonMarker_21" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy21_macro"  required="true" comment="Slightly behind the first corridor-split"/>
+                <find_object_component name="$PrisonMarker_22" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy22_macro"  required="true" comment="Airlock-tower Floor 1"/>
+                <find_object_component name="$PrisonMarker_23" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy23_macro"  required="true" comment="Airlock-tower Floor 2"/>
+                <find_object_component name="$PrisonMarker_24" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy24_macro"  required="true" comment="Airlock-tower Floor 3"/>
+                <find_object_component name="$PrisonMarker_25" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy25_macro"  required="true" comment="In the upward curve of the escape-pipe (for navigating Axiom)"/>
+
+                <find_object_component name="$PrisonMarker_26" groupname="$PrisonMarkerGroup" object="$PrisonModule" macro="macro.positiondummy26_macro"  required="true" comment="Hallways 'far' intersection"/>
+
+                <!-- switch to noclip in first-person and flew to a position visible from the cell-window, if the station constructionplan ever changes this will need to be updated -->
+                <create_position name="$WaitposCellFar" object="$PrisonRoom" space="$PrisonRoom.sector" x="-460m" y="27m" z="-843m" />
+				<delay exact="2s"/>
+				<create_mission cue="$MissionCue" name="'Escape'" description="'Find a way out of prison!'"
+                                type="missiontype.plot" faction="faction.civilian"  difficulty="level.hard" abortable="false" activate="true">
+                  <briefing>
+                    <objective step="1" action="objective.custom" customaction="'Find a way out of prison!'" />
+                  </briefing>
+                </create_mission>
+				<set_objective cue="$MissionCue" step="1" action="objective.custom" customaction="'Find a way out of prison!'" updatebriefing="true" comment="escape"/>
+              </actions>
+            </cue>
+
+            <cue name="Ch2_LowerAirlockPipe_Exit" checkinterval="1s">
+              <conditions>
+				<check_all>
+					<check_value value="@player.controlled.isclass.spacesuit" comment="only when in spacesuit"/>
+					<check_value value="player.ship.distanceto.{$PrisonMarker_25} lt 5.0"/>
+				</check_all>
+              </conditions>
+              <delay exact="5s"/>
+              <actions>
+                <set_object_relation_behaviour object="$PrisonStation" disable="false"/>
+                <signal_cue cue="Ch2_Alternative"/>
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+        <cue name="Ch2_Alternative" comment="hardcore/left axiom behind">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <remove_from_list name="md.$MissionDND" exact="Setup"/>
+			<remove_mission cue="$MissionCue" type="completed" />
+			<create_mission cue="$MissionCue" name="'Get to safety'" description="'Find a way back to the station.'"
+                                type="missiontype.plot" faction="faction.civilian"  difficulty="level.hard" abortable="false" activate="true">
+			  <briefing>
+				<objective step="1" action="objective.dockat" object="$PrisonStation"/>
+			  </briefing>
+			</create_mission>
+            <set_objective_from_briefing cue="$MissionCue" step="1"/>
+            <unlock_achievement name="TOA_PRISON_2" comment="Unlock early, creative player might find another way besides stealing the ship" />
+			<cancel_cue cue="Ch1_Intro" />
+            <set_value name="$StealShipMacro" exact="macro.ship_tel_s_fighter_02_b_macro"/>
+            <find_dockingbay name="this.$PrisonDock" object="$PrisonStation">
+              <match_dock storage="true" size="$StealShipMacro.docksize"/>
+            </find_dockingbay>
+            <do_if value="not this.$PrisonDock.exists" comment="fallback">
+              <find_object_component name="this.$PrisonDock" object="$PrisonStation" required="true">
+                <match_dock storage="true" size="$StealShipMacro.docksize"/>
+              </find_object_component>
+            </do_if>
+            <create_ship name="$StealShip" macro="$StealShipMacro" dock="this.$PrisonDock">
+              <owner exact="faction.civilian" overridenpc="true" />
+              <loadout ref="story_buzzard_prison_gamestart"/>
+              <paint ware="ware.paintmod_0045"/> <!-- Ministry Camo 1 / -->
+            </create_ship>
+			<create_ship name="$StealShip" macro="ship_tel_s_trans_container_02_a_macro" dock="this.$PrisonDock">
+			  <owner exact="faction.civilian" overridenpc="true" />
+			  <loadout ref="story_raven_hangar"/>
+			  <equipmentmods>
+			    <ship ware="ware.mod_ship_hidecargo_01"/>
+			  </equipmentmods>
+			  <paint ware="ware.paintmod_0045"/>
+			</create_ship>
+			<set_object_name object="$StealShip" page="20101" line="22504" comment="Raven Prototype readtext.{20101}.{22504}"/>
+          </actions>
+          <cues>
+			<cue name="Ch2_StationDocked">
+              <conditions>
+                <event_object_changed_room object="player.entity"/>
+                <check_value value="not player.ship.isclass.spacesuit"/>
+              </conditions>
+              <delay exact="1s"/>
+              <actions>
+                <remove_mission cue="$MissionCue" type="completed" />
+				<create_mission cue="$MissionCue" name="'Steal a ship'" description="'Steal a ship docked at the station.'"
+                                type="missiontype.plot" faction="faction.civilian"  difficulty="level.hard" abortable="false" activate="true">
+				  <briefing>
+					<objective step="1" action="objective.goto" object="$StealShip"/>
+				  </briefing>
+				</create_mission>
+				<set_objective cue="$MissionCue" step="1" action="objective.custom" object="$StealShip" customaction="'Steal ship!'" updatebriefing="true" comment="steal ship"/>
+              </actions>
+            </cue>
+            <cue name="Ch2_ResponseActor">
+              <actions>
+                <create_cue_actor name="$ResponseActor" cue="Ch2_Alternative">
+                  <select race="race.teladi" />
+                  <page exact="10501"/>
+                  <owner exact="faction.ministry"/>
+                  <skills>
+                    <skill type="management"  exact="7"/>
+                    <skill type="morale"      exact="4"/>
+                    <skill type="piloting"    exact="9"/>
+                    <skill type="engineering" exact="5"/>
+                    <skill type="boarding"    exact="7"/>
+                  </skills>
+                </create_cue_actor>
+              </actions>
+            </cue>
+
+            <cue name="Ch2_ShipToSteal_Recall" comment="needs to be outside the ch1-root-cue, otherwise recall would stop when ch1 is cancelled">
+              <actions>
+                <do_if value="$StealShip.isoperational and $StealShip.dock and $StealShip.dock.isstorage">
+                  <request_retrieval queuedresult="$QueuedResult1" grantedresult="$GrantedResult1" ship="$StealShip" highpriority="false" allowplayeronly="true" />
+                  <debug_text text="'request_retrieval for %s (%s) request=%s granted=%s'.[$StealShip, $StealShip.name, $QueuedResult1, $GrantedResult1]" chance="$DebugChance"/>
+                </do_if>
+              </actions>
+              <delay exact="37s"/>
+              <actions>
+                <reset_cue cue="Ch2_ShipToSteal_Recall" comment="periodically re-request, to avoid ship being put back in storage permanently, if player takes long"/>
+              </actions>
+            </cue>
+            <cue name="Ch2_ShipToSteal_Enter">
+              <conditions>
+                <event_object_changed_room object="player.entity" room="$StealShip.controlroom"/>
+              </conditions>
+              <actions>
+                <set_owner object="$StealShip" faction="faction.player"/>
+				<set_value name="md.Signal_Leaks.Manager.$SuppressSignalLeakGeneration" exact="false"/>
+				<remove_mission cue="$MissionCue" type="completed" />
+				<remove_value name="md.$GlobalHintsDND"/>
+                <cancel_cue cue="Ch2_ShipToSteal_Cleanup"/>
+              </actions>
+            </cue>
+
+            <cue name="Ch2_ShipToSteal_Undock">
+              <conditions>
+                <event_object_undocked object="$StealShip"/>
+              </conditions>
+              <delay exact="1s"/>
+              <actions>
+                <speak actor="$ResponseActor" broadcast="true" backgroundcomm="true">
+                  <text line="1000051" comment="Thief! Stop them!"/>
+                  <text line="1000053" comment="Don't let them get away!"/>
+                </speak>
+              </actions>
+            </cue>
+            
+            <cue name="Ch2_ShipToSteal_Cleanup" comment="limit window of opportunity">
+              <delay exact="60min"/>
+              <actions>
+                <cancel_cue cue="Ch2_ShipToSteal_Enter"/>
+                <destroy_object object="$StealShip"/>
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+      </cues>
+    </cue>
+  </cues>
+</mdscript>
