@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diff>
+  <remove sel="/mdscript/cues/comment()[1]"/>
+  <remove sel="/mdscript/cues/cue/actions[1]/set_value[@name='$DeepDebugChance']"/>
+  <remove sel="/mdscript/cues/cue/actions[1]/set_value[@name='$Page']"/>
+  <remove sel="/mdscript/cues/cue/actions[1]/set_value[@name='md.Signal_Leaks.Manager.$SuppressSignalLeakGeneration']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Setup']/actions[2]/signal_cue"/>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Setup']/cues" pos="before">
+    <delay exact="5s"/>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Setup']/cues" pos="before">
+    <actions>
+      <signal_cue cue="Ch1_Intro"/>
+    </actions>
+  </add>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Setup']/cues/cue[@name='Setup_Other_Player_Prisoner']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Setup']/cues/cue[@name='LockedDoorsHandler']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Setup']/cues/cue[@name='Setup_Axiom']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Setup']/cues/comment()[1]"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Axiom_Comments']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch0_Wait']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/actions/set_value[@name='$ObjectiveStep']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/actions/create_mission"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/actions/set_objective_from_briefing"/>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupCrate']" pos="before">
+    <cue name="Ch1_LightBlink" checkinterval="1s" instantiate="true">
+      <delay exact="[0.8s, 1.5s, 3s].random"/>
+      <actions>
+        <do_if value="@$Light1Status">
+          <trigger_animation object="$PrisonRoom" group="tag.light_01" trigger="activate"/>
+          <remove_value name="$Light1Status"/>
+          <add_effect object="$PrisonRoom" effect="'sparks_90deg_bursts_v1_single'">
+            <position space="$PrisonRoom" x="3.0m" y="2.9m" z="-6.4m"/>
+          </add_effect>
+        </do_if>
+        <do_else>
+          <trigger_animation object="$PrisonRoom" group="tag.light_01" trigger="deactivate"/>
+          <set_value name="$Light1Status" exact="true"/>
+        </do_else>
+      </actions>
+    </cue>
+  </add>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupRemoveLeaks']"/>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupEscape']/actions/comment()[2]">
+    <delay exact="2s"/>
+  </replace>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupEscape']/actions/create_ship">
+    <create_mission cue="$MissionCue" name="'Escape'" description="'Find a way out of prison!'" type="missiontype.plot" faction="faction.civilian" difficulty="level.hard" abortable="false" activate="true">
+      <briefing>
+        <objective step="1" action="objective.custom" customaction="'Find a way out of prison!'"/>
+      </briefing>
+    </create_mission>
+  </replace>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupEscape']/actions/create_order">
+    <set_objective cue="$MissionCue" step="1" action="objective.custom" customaction="'Find a way out of prison!'" updatebriefing="true" comment="escape"/>
+  </replace>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupEscape']/actions/set_object_name"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_SetupEscape']/actions/set_object_min_hull"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_LightBlink'][@instantiate='true'][@checkinterval='1s'][2]"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_Axiom_Conversation3']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/library"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_Axiom_Conversation_Started']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_Escape_LeaveCell']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_Escape_NearConsole']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch1_Escape_LeaveRoom']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Other_Prisoner_Conversation_Axiom_Comment']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Corridor_Guidance1']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Corridor_Guidance2']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Corridor_Guidance3']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_PowerSwitch_Objective']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_EnteredSpacesuit']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_PowerSwitch_Nearby']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_PowerSwitch_Functional']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Axiom_WalkToConsole_v2']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Axiom_Freed_NoCutscene']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Axiom_Freed_Cutscene']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Axiom_Hacking']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_AirlockSwitch_Objective']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_PickupCrate']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_PickupCrate_Dialog_Finished']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlock_NearbyNotArmed']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlock_NearbyAndArmed']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_AirlockSwitch_Broken']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlockPipe_Inside']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Call_EscapeShip_CreatePosition_DEBUG']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Call_EscapeShip2']"/>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlockPipe_Exit']/conditions/check_value[@comment='only when in spacesuit']">
+    <check_all>
+      <check_value value="@player.controlled.isclass.spacesuit" comment="only when in spacesuit"/>
+      <check_value value="player.ship.distanceto.{$PrisonMarker_25} lt 5.0"/>
+    </check_all>
+  </replace>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlockPipe_Exit']/conditions/check_value"/>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlockPipe_Exit']/actions/do_if">
+    <signal_cue cue="Ch2_Alternative"/>
+  </replace>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_LowerAirlockPipe_Exit']/actions/do_else"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_Failed_AxiomNotFreed']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_AxiomSpacesuit_Spawn']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_OnBoard']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch1_Intro']/cues/cue[@name='Ch2_AxiomPlayerReady']"/>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/actions/unlock_achievement" pos="before">
+    <remove_mission cue="$MissionCue" type="completed"/>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/actions/unlock_achievement" pos="before">
+    <create_mission cue="$MissionCue" name="'Get to safety'" description="'Find a way back to the station.'" type="missiontype.plot" faction="faction.civilian" difficulty="level.hard" abortable="false" activate="true">
+      <briefing>
+        <objective step="1" action="objective.dockat" object="$PrisonStation"/>
+      </briefing>
+    </create_mission>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/actions/unlock_achievement" pos="before">
+    <set_objective_from_briefing cue="$MissionCue" step="1"/>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/actions/set_value" pos="before">
+    <cancel_cue cue="Ch1_Intro"/>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/actions">
+    <create_ship name="$StealShip" macro="ship_tel_s_trans_container_02_a_macro" dock="this.$PrisonDock">
+      <owner exact="faction.civilian" overridenpc="true"/>
+      <loadout ref="story_raven_hangar"/>
+      <equipmentmods>
+        <ship ware="ware.mod_ship_hidecargo_01"/>
+      </equipmentmods>
+      <paint ware="ware.paintmod_0045"/>
+    </create_ship>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/actions">
+    <set_object_name object="$StealShip" page="20101" line="22504" comment="Raven Prototype readtext.{20101}.{22504}"/>
+  </add>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_AxiomSad']/@name">Ch2_StationDocked</replace>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/@instantiate"/>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/conditions/event_conversation_started">
+    <event_object_changed_room object="player.entity"/>
+  </replace>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/conditions">
+    <check_value value="not player.ship.isclass.spacesuit"/>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/actions" pos="before">
+    <delay exact="1s"/>
+  </add>
+  <replace sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/actions/speak">
+    <remove_mission cue="$MissionCue" type="completed"/>
+  </replace>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/actions">
+    <create_mission cue="$MissionCue" name="'Steal a ship'" description="'Steal a ship docked at the station.'" type="missiontype.plot" faction="faction.civilian" difficulty="level.hard" abortable="false" activate="true">
+      <briefing>
+        <objective step="1" action="objective.goto" object="$StealShip"/>
+      </briefing>
+    </create_mission>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_StationDocked']/actions">
+    <set_objective cue="$MissionCue" step="1" action="objective.custom" object="$StealShip" customaction="'Steal ship!'" updatebriefing="true" comment="steal ship"/>
+  </add>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_ShipToSteal_Guidance_DEBUG']"/>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_ShipToSteal_Enter']/actions/cancel_cue" pos="before">
+    <remove_mission cue="$MissionCue" type="completed"/>
+  </add>
+  <add sel="/mdscript/cues/cue/cues/cue[@name='Ch2_Alternative']/cues/cue[@name='Ch2_ShipToSteal_Enter']/actions/cancel_cue" pos="before">
+    <remove_value name="md.$GlobalHintsDND"/>
+  </add>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Ch3_Raider']"/>
+  <remove sel="/mdscript/cues/cue/cues/cue[@name='Prison_DEBUG']"/>
+</diff>

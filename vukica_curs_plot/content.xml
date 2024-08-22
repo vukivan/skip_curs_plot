@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content id="vukica_curs" name="Skip Empyrian Curs Plot" description="Skips Empyrian Curs plot entirely." author="vukica" version="100" date="2024-08-20" save="0">
+	<dependency id="ego_dlc_pirate" optional="false" name="Tides of Avarice"></dependency>
+</content>

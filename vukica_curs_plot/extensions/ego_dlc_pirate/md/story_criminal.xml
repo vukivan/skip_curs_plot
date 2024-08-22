@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diff>
+  <replace sel="/mdscript/cues/cue[@name='Start']/actions/set_value[@name='$story_criminal_wildcard']/@exact">1</replace>
+  <replace sel="/mdscript/cues/cue[@name='Start']/actions/set_value[@name='$story_criminal_arrested_curs']/@exact">0</replace>
+  <replace sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/@value">$story_criminal_wildcard and player.module != 'x4ep1_gamestart_pirate2'</replace>
+  <replace sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/set_value">
+    <delay exact="20s"/>
+  </replace>
+  <replace sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/do_if">
+    <find_station name="$Closeby_Station" space="player.galaxy" sortbydistanceto="player.entity">
+      <match_relation_to faction="faction.player" relation="dock"/>
+      <match_dock size="tag.dock_s" free="true"/>
+    </find_station>
+  </replace>
+  <add sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/create_ship" pos="before">
+    <find_dockingbay name="$ShipDock" object="$Closeby_Station" checkoperational="true">
+      <match_dock size="tag.dock_s" storage="false" walkable="true" free="true"/>
+    </find_dockingbay>
+  </add>
+  <remove sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/create_ship/@sector"/>
+  <add sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/create_ship" type="@dock">$ShipDock</add>
+  <remove sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_if/create_ship/safepos"/>
+  <replace sel="/mdscript/cues/cue[@name='Start']/cues/cue[@name='Story_Activation_Manager']/cues/cue[@name='Handle_Custom_Gamestart_Skip']/cues/cue/actions/do_elseif/@value">$story_criminal_arrested_curs and player.module != 'x4ep1_gamestart_pirate2'</replace>
+</diff>

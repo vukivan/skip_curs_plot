@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diff>
+  <replace sel="/gamestarts/gamestart[@id='x4ep1_gamestart_pirate2']/info/item[@name='{1021,2}']/@value">N/A</replace>
+  <replace sel="/gamestarts/gamestart[@id='x4ep1_gamestart_pirate2']/cutscene">
+    <type name="{1021,94}" description="{1021,95}" recommendation="20"/>
+  </replace>
+  <remove sel="/gamestarts/gamestart[@id='x4ep1_gamestart_pirate2']/intro"/>
+  <remove sel="/gamestarts/gamestart[@id='x4ep1_gamestart_pirate2']/type[@name='{1021,90}']"/>
+</diff>
