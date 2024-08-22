@@ -9,7 +9,6 @@
         <set_value name="$debugchance" exact="0" comment="keep ai-scripts from complaining"/>
         <set_value name="$DebugChance" exact="0"/>
 		<set_value name="$MissionCue"  exact="this"/>
-        <set_value name="md.Signal_Leaks.Manager.$SuppressSignalLeakGeneration" exact="true"/>
       </actions>
       <delay exact="0.1s"/>
       <actions>
@@ -128,14 +127,6 @@
                 <create_crate name="$ToolboxCrate" macro="macro.crate_gen_s_01_macro" slot="$CrateSlots.random" />
                 <add_cargo object="$ToolboxCrate" ware="ware.weapon_gen_spacesuit_laser_01_mk1" exact="1"/>
                 <!--add_cargo object="$ToolboxCrate" ware="ware.weapon_gen_spacesuit_laser_02_mk1" exact="1"/-->
-              </actions>
-            </cue>
-			<cue name="Ch1_SetupRemoveLeaks" comment="remove voice-leaks, during the spacesuit parts they repeat every few seconds endlessly and it becomes annoying very quickly ">
-              <actions>
-                <find_object_component name="$Leaks" object="$PrisonStation" signalleaktype="signalleaktype.voice" multiple="true"/>
-                <do_for_each name="$leak" in="$Leaks">
-                  <destroy_object object="$leak" explosion="false"/>
-                </do_for_each>
               </actions>
             </cue>
 			<cue name="Ch1_SetupPrisonEffects">
@@ -312,7 +303,6 @@
               </conditions>
               <actions>
                 <set_owner object="$StealShip" faction="faction.player"/>
-				<set_value name="md.Signal_Leaks.Manager.$SuppressSignalLeakGeneration" exact="false"/>
 				<remove_mission cue="$MissionCue" type="completed" />
 				<remove_value name="md.$GlobalHintsDND"/>
                 <cancel_cue cue="Ch2_ShipToSteal_Cleanup"/>
